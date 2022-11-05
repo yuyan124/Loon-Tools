@@ -1,0 +1,11 @@
+#!name=Spark Email
+#!desc=Spark Mail-智能邮箱+解锁订阅
+#!author=彭于晏💞
+#!icon=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/icons/spark.png
+#!homepage=https://github.com/yuyan124
+
+[Script]
+^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/(\$RCAnonymousID%)?(\w)*$) requires-body=1,script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/SparkMail.js
+
+[mitm]
+hostname=api.revenuecat.com
