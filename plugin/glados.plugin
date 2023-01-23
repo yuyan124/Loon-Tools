@@ -1,0 +1,13 @@
+#!name=Glados
+#!desc=Glados签到+Cookie
+#!author=Vanilia
+#!icon=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/icons/glados.png
+#!homepage=https://github.com/yuyan124
+
+[Script]
+cron "13 0 * * *" tag=GLaDOS签到, script-path=https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/glados.js
+http-request https:\/\/glados\.rocks\/api\/user\/checkin tag=获取GLaDOS_Cookie, script-path=https://raw.githubusercontent.com/evilbutcher/Quantumult_X/master/check_in/glados/glados.js
+
+
+[mitm]
+hostname=glados.rocks
