@@ -6,7 +6,7 @@
 
 [Script]
 cron "10 8 * * *" tag=签到, script-path=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/scripts/cmbchina.js
-https://weclub\.ccc\.cmbchina.com/SCRMCustomActivityFront/checkin/request/get-home-data\.json\?activityCode=checkin tag=获取Cookie, script-path=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/scripts/cmbchina.js, requires-body=1
+http-request https://weclub\.ccc\.cmbchina.com/SCRMCustomActivityFront/checkin/request/get-home-data\.json\?activityCode=checkin tag=获取Cookie, script-path=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/scripts/cmbchina.js, requires-body=1
 
 
 [mitm]
