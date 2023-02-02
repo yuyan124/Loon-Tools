@@ -1,0 +1,12 @@
+#!name=白条提额
+#!desc=京东金融白条每日提额
+#!author=Vanilia
+#!icon=https://raw.githubusercontent.com/yuyan124/Loon-Tools/main/icons/jriou.png
+#!homepage=https://github.com/yuyan124
+
+[Script]
+http-request ^https:\/\/ms\.jr\.jd\.com\/gw\/generic\/bt\/h5\/m\/queryCreditManage script-path=https://raw.githubusercontent.com/cyubuchen/scripts/master/cookie/jdBaiTiao.js, timeout=10, tag=京东白条Cookie
+cron "20 15 * * *" script-path=https://raw.githubusercontent.com/cyubuchen/scripts/master/task/jdBaiTiao.js,tag=京东白条提额
+
+[mitm]
+hostname=*.jr.jd.com
