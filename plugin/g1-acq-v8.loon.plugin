@@ -1,0 +1,26 @@
+#!name = G1 ACQ Plus v8
+#!desc = Google One 隐藏 SKU 改写（Pro 5TB 18M/15M/12M $0、AI Plus 2TB/400GB 12M $0、Ultra 20TB/30TB 1M $0），并在 https://one.google.com/g1-sku-report 提供本地控制台一键切换目标 SKU。移植自 Dgkncn/g1-acq-plus v8.0.0；Script 使用 Loon 3.5.1(983)+ 新语法。
+#!author = Dgkncn, crhywun (Loon port)
+#!homepage = https://github.com/Dgkncn/g1-acq-plus
+#!system = iOS,iPadOS
+#!date = 2026-11-25
+#!tag = Google,脚本
+#!type = normal
+
+[Rule]
+# 拦截 UDP 443（QUIC / HTTP3），促使支持回退的客户端改走 TCP，MITM 才能看到响应体。
+# Surge 的 REJECT-NO-DROP 在 Loon 中没有同名策略，等价写法是 REJECT-DROP（静默丢弃，不回包）。
+# 只想拦 QUIC 时，可把下面这一行替换为：PROTOCOL,QUIC,REJECT-DROP
+AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT-DROP
+
+[Script]
+# 新版语法：Loon 3.5.1 (build 983) 及以上。3.5.1(983) 起新语法为默认写法，旧语法仍可解析。
+response if ${url} ~= /^https:\/\/one\.google\.com\// then script("https://raw.githubusercontent.com/Dgkncn/g1-acq-plus/main/g1-acq.js") with requires_body=true, timeout=30, tag="G1 ACQ 改写"
+request if ${url} ~= /^https:\/\/one\.google\.com\/g1-sku-report\/?(?:\?.*)?$/ then script("https://raw.githubusercontent.com/Dgkncn/g1-acq-plus/main/g1-sku-report.js") with timeout=20, tag="G1 SKU 控制台"
+
+# —— 旧版 Loon（3.5.1 build 982 及更早）备用：先删掉上面两行，再启用下面两行 ——
+# http-response ^https:\/\/one\.google\.com\/ script-path=https://raw.githubusercontent.com/Dgkncn/g1-acq-plus/main/g1-acq.js, requires-body=true, timeout=30, tag=G1 ACQ 改写
+# http-request ^https:\/\/one\.google\.com\/g1-sku-report\/?(?:\?.*)?$ script-path=https://raw.githubusercontent.com/Dgkncn/g1-acq-plus/main/g1-sku-report.js, timeout=20, tag=G1 SKU 控制台
+
+[Mitm]
+hostname = one.google.com
