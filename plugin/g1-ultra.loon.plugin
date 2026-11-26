@@ -1,0 +1,33 @@
+#!name = G1 Ultra
+#!desc = Google One /ai 响应改写：g1.ios.20tb.m.v2 → g1.ios.20tb.m、g1.ios.30tb.ai.pro.m → g1.ios.30tb.m（用 Loon 原生 Rewrite 写死，不加载远程脚本）+ 屏蔽 HTTP3，让 Google app 的请求回退到 TCP，MITM 才拦得到响应。只追加规则和 MITM 主机，不替换你现有的 MITM 主机列表或证书。移植自 ios.duang.org/g1-ultra.sgmodule。
+#!author = duang (Loon port)
+#!homepage = https://ios.duang.org/g1-ultra.sgmodule
+#!system = iOS,iPadOS
+#!date = 2026-11-26
+#!tag = Google,Rewrite
+#!type = normal
+
+[Rewrite]
+# 新版 Rewrite 语法：Loon 3.5.1 (build 978) 及以上；旧语法见文末注释（Build 729+）。
+# 对应上游 g1.js 的 REPLACE 数组：把 iOS 的 Ultra SKU 去掉后缀，指向同容量的另一定价档。
+# 只作用于 /ai 页面（与上游模块 desc「Google One /ai 响应改写」一致），避免拿图片等二进制响应体做正则替换。
+# 注意：Loon 支持的 regex flag 只有 i / m / s，没有 g（default 全量替换）。
+response if ${url} ~= /^https:\/\/one\.google\.com\/ai(?:\?.*)?$/ then response.body.replace(/g1\.ios\.20tb\.m\.v2/, "g1.ios.20tb.m")
+response if ${url} ~= /^https:\/\/one\.google\.com\/ai(?:\?.*)?$/ then response.body.replace(/g1\.ios\.30tb\.ai\.pro\.m/, "g1.ios.30tb.m")
+
+# 另一种 30TB 目标（v8 那套的 1 折回退档）：把上面第二条整行替换成下面这行即可。
+# response if ${url} ~= /^https:\/\/one\.google\.com\/ai(?:\?.*)?$/ then response.body.replace(/g1\.ios\.30tb\.ai\.pro\.m/, "g1.ai.ultra.3months_ip_90p.acq")
+
+# —— 旧版 Loon 备用（Rewrite 旧语法，Build 729+）：删掉上面两条，启用下面这条 ——
+# ^https:\/\/one\.google\.com\/ai\?.*$ response-body-replace-regex g1\.ios\.20tb\.m\.v2 g1.ios.20tb.m g1\.ios\.30tb\.ai\.pro\.m g1.ios.30tb.m
+
+[Rule]
+# 原作者注释：Google app 走 HTTP/3 时 MITM 拦不到，必须屏蔽 UDP 443 才会回退到 TCP。
+# Surge 的 REJECT-NO-DROP 在 Loon 中没有同名策略，等价写法是 REJECT-DROP（静默丢弃，不回包）。
+# 只想拦 QUIC 时，可把下面这一行替换为：PROTOCOL,QUIC,REJECT-DROP
+AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT-DROP
+
+[Mitm]
+# Loon 会把插件里的 hostname 并入全局 MITM 列表（等价于 Surge 的 %APPEND%），不覆盖你已有的主机与证书。
+# 后两个域名沿用上游模块；本文件的 Rewrite 只匹配 one.google.com，用不到的话可以删掉。
+hostname = one.google.com, payments.google.com, play.googleapis.com
